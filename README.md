@@ -8,9 +8,7 @@ The pixel assets were designed by me, so you're free to use them as you like.
 
 As of writing, This the library only has one function.
 
-It converts fen string ex. "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-
-into a pixel art chess board.
+It converts fen string ex. "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR" into a pixel art chess board.
 
 ![Pixel Board](chess_board.png)
 
