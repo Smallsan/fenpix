@@ -1,6 +1,6 @@
 # Fenpix Library
 
-Fenex is a Rust library for converting fen string into pixel chess boards.
+Fenpix is a Rust library that converts FEN strings into pixel chess boards.
 
 The pixel assets were designed by me, so you're free to use them as you like.
 

@@ -1,10 +1,10 @@
 [package]
 name = "fenpix"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 authors = ["Small San"]
 readme = "README.md"
-description = "A rust library for converting fen string into pixel chess boards"
+description = "Fenpix is a Rust library that converts FEN strings into pixel chess boards."
 license = "MIT"
 
 [lib]
