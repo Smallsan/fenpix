@@ -1,24 +1,29 @@
 use image::{imageops::overlay, RgbaImage};
 use std::collections::HashMap;
+use std::env;
 
 pub fn fen_to_pixel_board(fen: &str, save_dir: &str, upscale_multiplier: u32) {
+    let exe_path = env::current_exe().unwrap();
+    let exe_dir = exe_path.parent().unwrap();
+
     let piece_images: HashMap<char, RgbaImage> = [
         // Black Pieces
-        ('p', image::open("src/chess_assets/pieces/black_pawn.png").unwrap().into_rgba8()),
-        ('r', image::open("src/chess_assets/pieces/black_rook.png").unwrap().into_rgba8()),
-        ('n', image::open("src/chess_assets/pieces/black_knight.png").unwrap().into_rgba8()),
-        ('b', image::open("src/chess_assets/pieces/black_bishop.png").unwrap().into_rgba8()),
-        ('q', image::open("src/chess_assets/pieces/black_queen.png").unwrap().into_rgba8()),
-        ('k', image::open("src/chess_assets/pieces/black_king.png").unwrap().into_rgba8()),
+        ('p', image::open(&exe_dir.join("src/chess_assets/pieces/black_pawn.png")).unwrap().into_rgba8()),
+        ('r', image::open(&exe_dir.join("src/chess_assets/pieces/black_rook.png")).unwrap().into_rgba8()),
+        ('n', image::open(&exe_dir.join("src/chess_assets/pieces/black_knight.png")).unwrap().into_rgba8()),
+        ('b', image::open(&exe_dir.join("src/chess_assets/pieces/black_bishop.png")).unwrap().into_rgba8()),
+        ('q', image::open(&exe_dir.join("src/chess_assets/pieces/black_queen.png")).unwrap().into_rgba8()),
+        ('k', image::open(&exe_dir.join("src/chess_assets/pieces/black_king.png")).unwrap().into_rgba8()),
         // White Pieces
-        ('P', image::open("src/chess_assets/pieces/white_pawn.png").unwrap().into_rgba8()),
-        ('R', image::open("src/chess_assets/pieces/white_rook.png").unwrap().into_rgba8()),
-        ('N', image::open("src/chess_assets/pieces/white_knight.png").unwrap().into_rgba8()),
-        ('B', image::open("src/chess_assets/pieces/white_bishop.png").unwrap().into_rgba8()),
-        ('Q', image::open("src/chess_assets/pieces/white_queen.png").unwrap().into_rgba8()),
-        ('K', image::open("src/chess_assets/pieces/white_king.png").unwrap().into_rgba8()),
-        ].iter().cloned().collect();
-        let board_image = image::open("src/chess_assets/board/board.png").unwrap().into_rgba8();
+        ('P', image::open(&exe_dir.join("src/chess_assets/pieces/white_pawn.png")).unwrap().into_rgba8()),
+        ('R', image::open(&exe_dir.join("src/chess_assets/pieces/white_rook.png")).unwrap().into_rgba8()),
+        ('N', image::open(&exe_dir.join("src/chess_assets/pieces/white_knight.png")).unwrap().into_rgba8()),
+        ('B', image::open(&exe_dir.join("src/chess_assets/pieces/white_bishop.png")).unwrap().into_rgba8()),
+        ('Q', image::open(&exe_dir.join("src/chess_assets/pieces/white_queen.png")).unwrap().into_rgba8()),
+        ('K', image::open(&exe_dir.join("src/chess_assets/pieces/white_king.png")).unwrap().into_rgba8()),
+    ].iter().cloned().collect();
+
+    let board_image = image::open(&exe_dir.join("src/chess_assets/board/board.png")).unwrap().into_rgba8();
 
         let board = fen.split_whitespace().next().unwrap();
         let mut img = board_image.clone();
