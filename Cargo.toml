@@ -4,6 +4,8 @@ version = "0.1.6"
 edition = "2021"
 authors = ["Small San"]
 readme = "README.md"
+repository = "https://github.com/Smallsan/fenpix"
+
 description = "Fenpix is a Rust library that converts FEN strings into pixel chess boards."
 license = "MIT"
 
