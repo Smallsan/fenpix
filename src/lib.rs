@@ -4,7 +4,7 @@
 use image::{imageops::overlay, RgbaImage, ImageFormat};
 use std::collections::HashMap;
 
-pub fn fen_to_pixel_board(fen: &str, save_dir: &str, upscale_multiplier: u32) {
+pub fn fen_to_board_img(fen: &str, save_dir: &str, upscale_multiplier: u32) {
     let piece_images: HashMap<char, RgbaImage> = [
         // Black Pieces
         ('p', image::load_from_memory_with_format(include_bytes!("chess_assets/pieces/black_pawn.png"), ImageFormat::Png).unwrap().into_rgba8()),
@@ -60,10 +60,10 @@ pub fn fen_to_pixel_board(fen: &str, save_dir: &str, upscale_multiplier: u32) {
 
 #[cfg(test)]
 mod tests {
-    use crate::fen_to_pixel_board;
+    use crate::fen_to_board_img;
 
     #[test]
-    fn test_fen_to_pixel_board() {
-        fen_to_pixel_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "chess_board.png", 1);
+    fn fen_to_board_img_test() {
+        fen_to_board_img("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "chess_board.png", 1);
     }
 }
