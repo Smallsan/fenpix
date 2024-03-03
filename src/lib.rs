@@ -1,6 +1,8 @@
-use image::{imageops::overlay, RgbaImage, DynamicImage, ImageFormat};
+#![cfg(not(doctest))]
+#![doc = include_str!("../README.md")]
+
+use image::{imageops::overlay, RgbaImage, ImageFormat};
 use std::collections::HashMap;
-use std::io::Cursor;
 
 pub fn fen_to_pixel_board(fen: &str, save_dir: &str, upscale_multiplier: u32) {
     let piece_images: HashMap<char, RgbaImage> = [
@@ -62,6 +64,6 @@ mod tests {
 
     #[test]
     fn test_fen_to_pixel_board() {
-        fen_to_pixel_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "chess_board.png", 3);
+        fen_to_pixel_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "chess_board.png", 1);
     }
 }
