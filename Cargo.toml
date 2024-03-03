@@ -1,0 +1,16 @@
+[package]
+name = "fenpix"
+version = "0.1.0"
+edition = "2021"
+authors = ["Small San"]
+readme = "README.md"
+description = "A rust library for converting fen string into pixel chess boards"
+license = "MIT"
+
+[lib]
+name = "fenpix"
+crate-type = ["lib"]
+
+[dependencies]
+image = "0.24.9"
+
