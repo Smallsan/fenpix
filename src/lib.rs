@@ -367,7 +367,7 @@ mod tests {
         fen_to_board_img(
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
             "chess_board.png",
-            1,
+            3,
         );
     }
 }
