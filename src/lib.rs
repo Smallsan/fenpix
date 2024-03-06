@@ -132,7 +132,7 @@ mod tests {
     #[test]
     fn fen_to_board_img_test() {
         fen_to_board_img(
-            "5k1r/2q3p1/p3p2p/1B3p1Q/n4P2/6P1/bbP2N1P/1K1RR3",
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
             "chess_board.png",
             3,
             ChessAssets::default(),
