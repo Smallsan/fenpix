@@ -1,8 +1,10 @@
 #![cfg(not(doctest))]
 #![doc = include_str!("../README.md")]
 
-use image::{imageops::overlay, ImageFormat, RgbaImage};
-use std::{collections::HashMap, io::Cursor};
+mod chess_assets;
+pub use chess_assets::asset_manager::ChessAssets;
+use image::imageops::overlay;
+use std::io::Cursor;
 
 /// Converts a FEN (Forsyth–Edwards Notation) string to a chess board image and saves it to a file.
 ///
@@ -11,6 +13,7 @@ use std::{collections::HashMap, io::Cursor};
 /// * `fen` - The FEN string representing the chess position.
 /// * `save_dir` - The directory where the generated image will be saved.
 /// * `upscale_multiplier` - The multiplier for upscaling the image.
+/// * `chess_assets` - The chess assets to use for generating the board image.
 ///
 /// # Example
 ///
@@ -19,132 +22,14 @@ use std::{collections::HashMap, io::Cursor};
 ///
 /// fen_to_board_img("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "chess_board.png", 2);
 /// ```
-pub fn fen_to_board_img(fen: &str, save_dir: &str, upscale_multiplier: u32) {
-    let piece_images: HashMap<char, RgbaImage> = [
-        // Black Pieces
-        (
-            'p',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/black_pawn.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'r',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/black_rook.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'n',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/black_knight.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'b',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/black_bishop.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'q',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/black_queen.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'k',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/black_king.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        // White Pieces
-        (
-            'P',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/white_pawn.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'R',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/white_rook.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'N',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/white_knight.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'B',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/white_bishop.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'Q',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/white_queen.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'K',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/white_king.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-    ]
-    .iter()
-    .cloned()
-    .collect();
-
-    let board_image = image::load_from_memory_with_format(
-        include_bytes!("chess_assets/board/board.png"),
-        ImageFormat::Png,
-    )
-    .unwrap()
-    .into_rgba8();
-
+pub fn fen_to_board_img(
+    fen: &str,
+    save_dir: &str,
+    upscale_multiplier: u32,
+    chess_assets: ChessAssets,
+) {
     let board = fen.split_whitespace().next().unwrap();
-    let mut img = board_image.clone();
+    let mut img = chess_assets.board_image.clone();
     let square_size = (img.width() - 8) / 8; // Subtract border size from width before dividing by 8
     let piece_size = 16;
     let offset = (square_size - piece_size) / 2;
@@ -161,7 +46,7 @@ pub fn fen_to_board_img(fen: &str, save_dir: &str, upscale_multiplier: u32) {
             x += digit;
             continue;
         }
-        if let Some(piece_image) = piece_images.get(&char) {
+        if let Some(piece_image) = chess_assets.piece_images.get(&char) {
             overlay(
                 &mut img,
                 piece_image,
@@ -187,136 +72,18 @@ pub fn fen_to_board_img(fen: &str, save_dir: &str, upscale_multiplier: u32) {
 ///
 /// * `fen` - The FEN string representing the chess position.
 /// * `upscale_multiplier` - The multiplier for upscaling the image.
+/// * `chess_assets` - The chess assets to use for generating the board image.
 ///
 /// # Returns
 ///
 /// A vector of bytes representing the image buffer.
-pub fn fen_to_board_buffer(fen: &str, upscale_multiplier: u32) -> Vec<u8> {
-    let piece_images: HashMap<char, RgbaImage> = [
-        // Black Pieces
-        (
-            'p',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/black_pawn.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'r',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/black_rook.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'n',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/black_knight.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'b',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/black_bishop.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'q',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/black_queen.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'k',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/black_king.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        // White Pieces
-        (
-            'P',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/white_pawn.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'R',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/white_rook.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'N',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/white_knight.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'B',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/white_bishop.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'Q',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/white_queen.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-        (
-            'K',
-            image::load_from_memory_with_format(
-                include_bytes!("chess_assets/pieces/white_king.png"),
-                ImageFormat::Png,
-            )
-            .unwrap()
-            .into_rgba8(),
-        ),
-    ]
-    .iter()
-    .cloned()
-    .collect();
-
-    let board_image = image::load_from_memory_with_format(
-        include_bytes!("chess_assets/board/board.png"),
-        ImageFormat::Png,
-    )
-    .unwrap()
-    .into_rgba8();
-
+pub fn fen_to_board_buffer(
+    fen: &str,
+    upscale_multiplier: u32,
+    chess_assets: ChessAssets,
+) -> Vec<u8> {
     let board = fen.split_whitespace().next().unwrap();
-    let mut img = board_image.clone();
+    let mut img = chess_assets.board_image.clone();
     let square_size = (img.width() - 8) / 8; // Subtract border size from width before dividing by 8
     let piece_size = 16;
     let offset = (square_size - piece_size) / 2;
@@ -333,7 +100,7 @@ pub fn fen_to_board_buffer(fen: &str, upscale_multiplier: u32) -> Vec<u8> {
             x += digit;
             continue;
         }
-        if let Some(piece_image) = piece_images.get(&char) {
+        if let Some(piece_image) = chess_assets.piece_images.get(&char) {
             overlay(
                 &mut img,
                 piece_image,
@@ -360,14 +127,15 @@ pub fn fen_to_board_buffer(fen: &str, upscale_multiplier: u32) -> Vec<u8> {
 
 #[cfg(test)]
 mod tests {
-    use crate::fen_to_board_img;
+    use crate::{chess_assets::asset_manager::ChessAssets, fen_to_board_img};
 
     #[test]
     fn fen_to_board_img_test() {
         fen_to_board_img(
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+            "5k1r/2q3p1/p3p2p/1B3p1Q/n4P2/6P1/bbP2N1P/1K1RR3",
             "chess_board.png",
             3,
+            ChessAssets::default(),
         );
     }
 }
