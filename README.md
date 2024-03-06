@@ -21,27 +21,32 @@ Converts fen string to a chess board image buffer.
 Using it is pretty simple.
 
 ```rust
-// import the library.
+// Import the library.
 use fenix::*;
 
-// The function fen_to_board_img takes 3 parameters.
-// The fen string, The image output directory and The upscale multiplier.
+// The function `fen_to_board_img` takes four parameters:
+// 1. The FEN string
+// 2. The image output directory
+// 3. The upscale multiplier
+// 4. The ChessAssets instance
 fen_to_board_img("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "chess_board.png", 1, ChessAssets::default());
 
-// The function fen_to_board_buffer takes 2 parameters.
-// The fen string and the upscale multiplier.
+// The function `fen_to_board_buffer` also takes three parameters:
+// 1. The FEN string
+// 2. The upscale multiplier
+// 3. The ChessAssets instance
 let img_buffer = fen_to_board_buffer("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", 1, ChessAssets::default());
 
-// The function above is inefficient because it loads all the chess assets everytime the function is called.
-// If you want something more peformant you should load the assets and store them in a variable.
+// The above functions are inefficient because they load all the chess assets every time they are called.
+// For better performance, load the assets once and store them in a variable.
 
 fn main() {
     let assets = ChessAssets::default();
 
     loop {
-        fen_to_board_img("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "chess_board.png", 1, assets);
+        fen_to_board_img("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "chess_board.png", 1, &assets);
 
-        let img_buffer = fen_to_board_buffer("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", 1, assets);
+        let img_buffer = fen_to_board_buffer("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", 1, &assets);
     }
 }
 
