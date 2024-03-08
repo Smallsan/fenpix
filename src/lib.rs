@@ -30,10 +30,10 @@ pub fn fen_to_board_img(
 ) {
     let board = fen.split_whitespace().next().unwrap();
     let mut img = chess_assets.board_image.clone();
-    let square_size = (img.width() - 8) / 8; // Subtract border size from width before dividing by 8
+    let square_size = (img.width() - 2 * 7) / 8; // Subtract border size from width before dividing by 8
     let piece_size = 16;
     let offset = (square_size - piece_size) / 2;
-    let border_size = 4;
+    let border_size = 9;
     let mut x = 0;
     let mut y = 0;
     for char in board.chars() {
@@ -84,10 +84,10 @@ pub fn fen_to_board_buffer(
 ) -> Vec<u8> {
     let board = fen.split_whitespace().next().unwrap();
     let mut img = chess_assets.board_image.clone();
-    let square_size = (img.width() - 8) / 8; // Subtract border size from width before dividing by 8
+    let square_size = (img.width() - 2 * 7) / 8; // Subtract border size from width before dividing by 8
     let piece_size = 16;
     let offset = (square_size - piece_size) / 2;
-    let border_size = 4;
+    let border_size = 9;
     let mut x = 0;
     let mut y = 0;
     for char in board.chars() {
@@ -132,7 +132,7 @@ mod tests {
     #[test]
     fn fen_to_board_img_test() {
         fen_to_board_img(
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
             "chess_board.png",
             3,
             ChessAssets::default(),
