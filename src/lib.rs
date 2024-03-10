@@ -2,7 +2,9 @@
 #![doc = include_str!("../README.md")]
 
 mod chess_assets;
+mod errors;
 pub use chess_assets::asset_manager::ChessAssets;
+use errors::FenToImgError;
 use image::imageops::overlay;
 use std::io::Cursor;
 
@@ -27,8 +29,9 @@ pub fn fen_to_board_img(
     save_dir: &str,
     upscale_multiplier: u32,
     chess_assets: ChessAssets,
-) {
-    let board = fen.split_whitespace().next().unwrap();
+) -> Result<(), FenToImgError>{
+    let fen_parts: Vec<&str> = fen.split_whitespace().collect();
+    let board = fen.split_whitespace().next().ok_or("FEN string is empty")?;
     let mut img = chess_assets.board_image.clone();
     let square_size = (img.width() - 2 * 7) / 8; // Subtract border size from width before dividing by 8
     let piece_size = 16;
@@ -46,10 +49,15 @@ pub fn fen_to_board_img(
             x += digit;
             continue;
         }
-        if let Some(piece_image) = chess_assets.piece_images.get(&char) {
+        if let Some(original_piece_image) = chess_assets.piece_images.get(&char) {
+            let piece_image = if fen_parts[1] == "b" {
+                image::imageops::rotate180(original_piece_image)
+            } else {
+                original_piece_image.clone()
+            };
             overlay(
                 &mut img,
-                piece_image,
+                &piece_image,
                 (x * square_size + offset + border_size) as i64,
                 (y * square_size + offset + border_size) as i64,
             );
@@ -61,9 +69,13 @@ pub fn fen_to_board_img(
     let new_height = img.height() * upscale_multiplier;
     let upscale_filter = image::imageops::FilterType::Nearest;
 
-    let upscaled_img = image::imageops::resize(&img, new_width, new_height, upscale_filter);
+    let mut upscaled_img = image::imageops::resize(&img, new_width, new_height, upscale_filter);
+    
+    if fen_parts[1] == "b" {
+        upscaled_img = image::imageops::rotate180(&upscaled_img);
+    }
 
-    upscaled_img.save(save_dir).unwrap();
+    upscaled_img.save(save_dir).map_err(FenToImgError::from)
 }
 
 /// Converts a FEN (Forsyth–Edwards Notation) string to a chess board image and returns it as a buffer.
@@ -81,8 +93,9 @@ pub fn fen_to_board_buffer(
     fen: &str,
     upscale_multiplier: u32,
     chess_assets: ChessAssets,
-) -> Vec<u8> {
-    let board = fen.split_whitespace().next().unwrap();
+) -> Result<Vec<u8>, FenToImgError> {
+    let fen_parts: Vec<&str> = fen.split_whitespace().collect();
+    let board = fen.split_whitespace().next().ok_or("FEN string is empty")?;
     let mut img = chess_assets.board_image.clone();
     let square_size = (img.width() - 2 * 7) / 8; // Subtract border size from width before dividing by 8
     let piece_size = 16;
@@ -100,10 +113,15 @@ pub fn fen_to_board_buffer(
             x += digit;
             continue;
         }
-        if let Some(piece_image) = chess_assets.piece_images.get(&char) {
+        if let Some(original_piece_image) = chess_assets.piece_images.get(&char) {
+            let piece_image = if fen_parts[1] == "b" {
+                image::imageops::rotate180(original_piece_image)
+            } else {
+                original_piece_image.clone()
+            };
             overlay(
                 &mut img,
-                piece_image,
+                &piece_image,
                 (x * square_size + offset + border_size) as i64,
                 (y * square_size + offset + border_size) as i64,
             );
@@ -115,14 +133,18 @@ pub fn fen_to_board_buffer(
     let new_height = img.height() * upscale_multiplier;
     let upscale_filter = image::imageops::FilterType::Nearest;
 
-    let upscaled_img = image::imageops::resize(&img, new_width, new_height, upscale_filter);
+    let mut upscaled_img = image::imageops::resize(&img, new_width, new_height, upscale_filter);
+
+    if fen_parts[1] == "b" {
+        upscaled_img = image::imageops::rotate180(&upscaled_img);
+    }
 
     let mut buffer = Cursor::new(Vec::new());
     upscaled_img
         .write_to(&mut buffer, image::ImageOutputFormat::Png)
-        .unwrap();
+        .map_err(FenToImgError::from)?;
 
-    buffer.into_inner()
+    Ok(buffer.into_inner())
 }
 
 #[cfg(test)]
@@ -131,11 +153,12 @@ mod tests {
 
     #[test]
     fn fen_to_board_img_test() {
-        fen_to_board_img(
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        let result = fen_to_board_img(
+            "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w",
             "chess_board.png",
             3,
             ChessAssets::default(),
         );
+        result.unwrap();
     }
 }

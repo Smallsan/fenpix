@@ -29,13 +29,17 @@ use fenix::*;
 // 2. The image output directory
 // 3. The upscale multiplier
 // 4. The ChessAssets instance
-fen_to_board_img("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "chess_board.png", 1, ChessAssets::default());
+// This returns an result(), or an error if it fails to convert the fen to image.
+let result = fen_to_board_img("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "chess_board.png", 1, ChessAssets::default());
+
+result.unwrap();
 
 // The function `fen_to_board_buffer` also takes three parameters:
 // 1. The FEN string
 // 2. The upscale multiplier
 // 3. The ChessAssets instance
-let img_buffer = fen_to_board_buffer("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", 1, ChessAssets::default());
+// This returns an result type that needs to be matched or unwrapped.
+let img_buffer = fen_to_board_buffer("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", 1, ChessAssets::default()).unwrap();
 
 // The above functions are inefficient because they load all the chess assets every time they are called.
 // For better performance, load the assets once and store them in a variable.
@@ -44,9 +48,9 @@ fn main() {
     let assets = ChessAssets::default();
 
     loop {
-        fen_to_board_img("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "chess_board.png", 1, &assets);
+        fen_to_board_img("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "chess_board.png", 1, &assets).unwrap();
 
-        let img_buffer = fen_to_board_buffer("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", 1, &assets);
+        let img_buffer = fen_to_board_buffer("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", 1, &assets).unwrap();
     }
 }
 
