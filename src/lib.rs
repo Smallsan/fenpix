@@ -11,7 +11,7 @@ use std::io::Cursor;
 fn generate_board_image(
     fen: &str,
     upscale_multiplier: u32,
-    chess_assets: ChessAssets,
+    chess_assets: &ChessAssets,
 ) -> Result<DynamicImage, FenToImgError> {
     let fen_parts: Vec<&str> = fen.split_whitespace().collect();
     let board = fen.split_whitespace().next().ok_or("FEN string is empty")?;
@@ -81,9 +81,9 @@ pub fn fen_to_board_img(
     fen: &str,
     save_dir: &str,
     upscale_multiplier: u32,
-    chess_assets: ChessAssets,
+    chess_assets: &ChessAssets,
 ) -> Result<(), FenToImgError> {
-    let img = generate_board_image(fen, upscale_multiplier, chess_assets)?;
+    let img = generate_board_image(fen, upscale_multiplier, &chess_assets)?;
     img.save(save_dir).map_err(FenToImgError::from)
 }
 
@@ -101,9 +101,9 @@ pub fn fen_to_board_img(
 pub fn fen_to_board_buffer(
     fen: &str,
     upscale_multiplier: u32,
-    chess_assets: ChessAssets,
+    chess_assets: &ChessAssets,
 ) -> Result<Vec<u8>, FenToImgError> {
-    let img = generate_board_image(fen, upscale_multiplier, chess_assets)?;
+    let img = generate_board_image(fen, upscale_multiplier, &chess_assets)?;
 
     let mut buffer = Cursor::new(Vec::new());
     img.write_to(&mut buffer, image::ImageOutputFormat::Png)
@@ -122,7 +122,7 @@ mod tests {
             "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w",
             "chess_board.png",
             3,
-            ChessAssets::default(),
+            &ChessAssets::default(),
         );
         result.unwrap();
     }
