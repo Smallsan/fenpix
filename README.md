@@ -31,7 +31,7 @@ use fenix::*;
 // 4. The ChessAssets instance
 // This returns an result(), or an error if it fails to convert the fen to image.
 // The board also auto rotates depending on whose turn it is.
-let result = fen_to_board_img("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w", "chess_board.png", 1, ChessAssets::default());
+let result = fen_to_board_img("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w", "chess_board.png", 1, &ChessAssets::default());
 
 result.unwrap();
 
