@@ -211,6 +211,12 @@ impl ChessAssets {
         self.piece_images.insert('P', image);
         Ok(())
     }
+    // Board 510x510 with 9 pixels as border
+    pub fn set_board(&mut self, image_path: &str) -> Result<(), FenToImgError> {
+        let image = image::open(image_path).map_err(|err| FenToImgError::ImageError(err))?.to_rgba8();
+        self.board_image = image;
+        Ok(())
+    }
     
 
 }
